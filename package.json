@@ -1,0 +1,44 @@
+{
+  "name": "hcm-lite",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "dev": "concurrently -k \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "nodemon --exec \"node --env-file-if-exists=.env\" server/dev.js",
+    "dev:web": "vite --host localhost --port 3000 --strictPort",
+    "build": "vite build",
+    "start": "node --env-file-if-exists=.env server/index.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@github/copilot-sdk": "^1.0.26",
+    "@vladmandic/face-api": "^1.7.15",
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^18.0.9",
+    "express": "^5.1.0",
+    "google-auth-library": "^11.3.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.468.0",
+    "mongodb": "^7.7.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.4",
+    "concurrently": "^9.2.1",
+    "nodemon": "^3.1.14",
+    "vite": "^7.1.10"
+  },
+  "overrides": {
+    "@github/copilot-sdk": {
+      "zod": "^4.6.7"
+    }
+  }
+}

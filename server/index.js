@@ -10,8 +10,9 @@ if (!process.env.JWT_SECRET) {
   process.env.DEV_JWT_SECRET = randomBytes(48).toString("base64url");
   console.warn("JWT_SECRET is unset. Using a temporary development-only secret; sessions expire when the server restarts.");
 }
-const server = app.listen(port, "127.0.0.1", () => {
-  console.log(`HCM Lite API listening at http://localhost:${port}`);
+const host = process.env.HOST || (process.env.NODE_ENV === "production" ? "0.0.0.0" : "127.0.0.1");
+const server = app.listen(port, host, () => {
+  console.log(`HCM Lite API listening at http://${host}:${port}`);
 });
 
 let shuttingDown = false;

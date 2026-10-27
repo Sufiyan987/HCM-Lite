@@ -30,6 +30,21 @@ npm run build
 npm start
 ```
 
+### Deploy the full app on Render
+
+The app needs a Node web service and persistent storage for SQLite. Deploy the repository on Render using the included `render.yaml` Blueprint. It creates a paid Starter web service and a 1 GB persistent disk; Render's free web services do not support persistent disks, so do not remove the disk if you want user accounts, conversations, and records to survive restarts and deploys. Review current Render pricing before creating the service.
+
+After the Blueprint creates the service, open its Environment settings and set:
+
+- `APP_ORIGIN` to the service's public HTTPS URL (for example, `https://hcm-lite.onrender.com`).
+- `OAUTH_CALLBACK_BASE_URL` to that same public HTTPS origin.
+- `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` from a production GitHub OAuth App. Set its callback URL to `<APP_ORIGIN>/api/ai/copilot/callback`. A GitHub OAuth App has one callback URL; use a separate OAuth App for local development if needed.
+- `GOOGLE_CLIENT_ID` is optional. If enabled, add the public `APP_ORIGIN` to the Google OAuth client's authorized JavaScript origins.
+
+Keep all secret values in Render's Environment settings, never in the repository. Save changes and wait for the service deploy to finish, then open `<APP_ORIGIN>/HCM` and create the first Admin account. A fresh hosted service has its own empty database; local accounts and data are not uploaded.
+
+Local ComfyUI at `127.0.0.1:8188` is not reachable by the hosted server. Image generation/editing therefore works only when ComfyUI is available to the server at its configured `COMFYUI_URL`; do not expose an unauthenticated ComfyUI port publicly. GitHub Copilot and Google OAuth also require the production callback/origin settings above.
+
 Keep the existing `.env` file; do not create another one. Set a stable, randomly generated `JWT_SECRET`, `APP_ORIGIN=http://localhost:3000`, `OAUTH_CALLBACK_BASE_URL=http://localhost:3001`, and the `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` from a GitHub OAuth App. Register `http://localhost:3001/api/ai/copilot/callback` as the OAuth callback URL, restart `npm run dev`, then each user connects their own GitHub Copilot account in HCM Settings. A GitHub Copilot subscription or eligible Copilot access is required for each linked account. GitHub tokens are encrypted at rest using `JWT_SECRET`, and each ordinary chat uses only the requesting user's token. Copilot sessions have no tools or filesystem access and receive only role-scoped workspace data. The Copilot callback is localhost-only; temporary Cloudflare links cannot complete this OAuth flow. Image generation and editing use the local ComfyUI server without an external image API: install ComfyUI and a compatible checkpoint model on the same PC, start its local server (default `http://127.0.0.1:8188`), and optionally set `COMFYUI_URL` and `COMFYUI_CHECKPOINT` in the existing `.env` file. Generation requires a running ComfyUI server and downloaded model; performance depends on the PC and model, and integrated graphics/CPU-only machines may be very slow. Uploaded edit images are sent to the local ComfyUI service and may remain in its input/output folders. The old `AI_API_KEY`, `AI_MODEL`, and `AI_IMAGE_MODEL` settings are not used by image generation.
 
 Google sign-in uses the free Google Identity Services web flow and is available for sign-in (not account sign-up). In Google Cloud Console, configure the OAuth consent screen, create an OAuth client ID of type **Web application**, and add `http://localhost:3000` under **Authorized JavaScript origins** (add the exact HTTPS origin of your Cloudflare tunnel or deployed site too; do not include `/HCM`). Put the resulting client ID in the server `.env` file as `GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com`, then restart the API. No Google client secret is needed for this popup-based flow. The API verifies the ID token and sign-in nonce. An existing account can link its verified Google email on first Google sign-in. The first Admin is created during workspace setup, then can use Google sign-in with that same verified email.
@@ -55,5 +70,3 @@ Workspace records, Copilot chat history, and uploaded chat files are saved in SQ
 npm test
 npm run build
 ```
-#   H C M  
- 
